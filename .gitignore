@@ -42,9 +42,6 @@ phpunit.phar
 
 /frontend/runtime/
 /backend/runtime/
-/common/config/
-/backend/config/
-/frontend/config/
 /frontend/cache/
 /api/runtime
 
