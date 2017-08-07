@@ -23,6 +23,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'company_name',
+             'mobile',
+             'id_card',
             'token',
             'status',
             'updated_at',

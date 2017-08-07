@@ -3,16 +3,16 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\User;
+use common\models\FddSignature;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use common\models\search\FddSignatureSearch;
 /**
- * UserController implements the CRUD actions for User model.
+ * SignatureeController implements the CRUD actions for Signature model.
  */
-class UserController extends Controller
+class FddSignatureController extends Controller
 {
     /**
      * @inheritdoc
@@ -30,22 +30,26 @@ class UserController extends Controller
     }
 
     /**
-     * Lists all User models.
+     * Lists all Signature models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => User::find(),
-        ]);
+       $searchModel = new FddSignatureSearch();
+       print_r(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->backendSearch(Yii::$app->request->queryParams);
+//        $dataProvider = new ActiveDataProvider([
+//            'query' => FddSignature::find(),
+//        ]);
 
         return $this->render('index', [
+             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
 
     /**
-     * Displays a single User model.
+     * Displays a single Signature model.
      * @param integer $id
      * @return mixed
      */
@@ -57,17 +61,15 @@ class UserController extends Controller
     }
 
     /**
-     * Creates a new User model.
+     * Creates a new Signature model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new User();
-    
-        //echo  Yii::$app->security->generateRandomString()."<br>";
-        //echo md5("放飞的风帆风".time());exit;
-        if ($model->load(Yii::$app->request->post()) && $model->saveUser()) {
+        $model = new FddSignature();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
@@ -77,7 +79,7 @@ class UserController extends Controller
     }
 
     /**
-     * Updates an existing User model.
+     * Updates an existing Signature model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -86,7 +88,7 @@ class UserController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->update()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
@@ -96,7 +98,7 @@ class UserController extends Controller
     }
 
     /**
-     * Deletes an existing User model.
+     * Deletes an existing Signature model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -109,15 +111,15 @@ class UserController extends Controller
     }
 
     /**
-     * Finds the User model based on its primary key value.
+     * Finds the Signature model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return User the loaded model
+     * @return Signature the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = User::findOne($id)) !== null) {
+        if (($model = FddSignature::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

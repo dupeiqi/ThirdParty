@@ -38,6 +38,7 @@ use mdm\admin\components\MenuHelper;
                     ['label' => '用户管理', 'icon' => 'file-code-o', 'url' => ['/user']],
                     ['label' => '证书管理', 'icon' => 'file-code-o', 'url' => ['/certificate']],
                     ['label' => '签章管理', 'icon' => 'file-code-o', 'url' => ['/signature']],
+                    ['label' => '法大大签章管理', 'icon' => 'file-code-o', 'url' => ['/fdd-signature']],
 //                    ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
 //                    ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
 //                    [

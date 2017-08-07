@@ -12,7 +12,13 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'company_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'company_name')->textInput(['maxlength' => true])->label('公司名称或姓名') ?>
+    <?= $form->field($model, 'id_card')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
+    <?=$model -> type==1 ?  $form->field($model, 'fdd_ca')->textInput(['maxlength' => true]):'' ?>
+     <!--隐藏表单，用于给js判断是否显示模板选择框-->
+     <?= $model -> type==1 ? '' :Html::activeHiddenInput($model, 'fdd_ca')?>
+     <?= $form->field($model, 'type')->radioList(['1'=>'公司','2'=>'个人']) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
