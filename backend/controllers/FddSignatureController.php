@@ -36,7 +36,7 @@ class FddSignatureController extends Controller
     public function actionIndex()
     {
        $searchModel = new FddSignatureSearch();
-       print_r(Yii::$app->request->queryParams);
+  
         $dataProvider = $searchModel->backendSearch(Yii::$app->request->queryParams);
 //        $dataProvider = new ActiveDataProvider([
 //            'query' => FddSignature::find(),

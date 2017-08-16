@@ -40,6 +40,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?=
     GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'showFooter'=>true,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'id',
@@ -58,6 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'contract_id',
                 'label' => '合同编号',
+                 'footerOptions'=>['class'=>'hide'],//隐藏底部的当前列
             ],
             [
                 'attribute' => 'status',

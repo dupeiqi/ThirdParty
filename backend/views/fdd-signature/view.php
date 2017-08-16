@@ -6,36 +6,52 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\base\Signature */
 
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Signatures', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title ='法大大签暑详情';
+
 ?>
 <div class="signature-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-
+    
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'id',
-            'company_id',
-            'src_url:url',
-            'dest_url:url',
-            'count',
-            'status',
-            'updated_at',
-            'created_at',
+            'transaction_id',          
+             [
+                'attribute' => 'contract_id',
+                'label' => '合同编号',
+               
+            ]
+            ,
+            'customer_id',
+            'doc_title',
+            'client_role',
+            'sign_keyword',
+             'timestamp',            
+            [
+                'attribute' => 'updated_at',
+                'label' => '更新时间',
+                'value' => function($model) {
+                    return date("Y-m-d H:i:s",$model->updated_at);
+                }
+            ],
+            [
+                'attribute' => 'created_at',
+                'label' => '创建时间',
+                'value' => function($model) {
+                    return date("Y-m-d H:i:s",$model->created_at);
+                }
+            ],
+            [
+                'attribute' => 'status',
+                'label' => '状态',
+                'value' => function($model) {
+                    return $model->status == 1 ? '成功' : '失败';
+                }
+            ],
+            'download_url:url',
+            'viewpdf_url:url',
+                
         ],
     ]) ?>
 

@@ -14,19 +14,6 @@ class FddSignatureSearch extends FddSignature
 {
     public $param;
     
-//    /**
-//     * @inheritdoc
-//     */
-//    public function rules()
-//    {
-//        return [
-//            [['id', 'uid', 'status', 'updated_at', 'created_at'], 'integer'],
-//            [['products', 'param', 'is_del'], 'safe'],
-//            ['serial_number','string'],
-//            ['serial_number','trim'],
-//        ];
-//    }
-
     /**
      * @inheritdoc
      */
@@ -85,7 +72,7 @@ class FddSignatureSearch extends FddSignature
                 'pageSize' => 15
             ]
         ]);
-
+     
         $this->load($params);
 
         if (!$this->validate()) {
@@ -94,9 +81,9 @@ class FddSignatureSearch extends FddSignature
             return $dataProvider;
         }
       
-        if ($this->param) {
-            $query->orFilterWhere(['contract_id' => $this->param]);
-            $query->orFilterWhere(['transaction_id', $this->param]);
+        if (isset($params['FddSignatureSearch']['param'])) {
+            $query->orFilterWhere(['contract_id' => $params['FddSignatureSearch']['param']]);
+            $query->orFilterWhere(['transaction_id'=> $params['FddSignatureSearch']['param']]);
         }
 
 
