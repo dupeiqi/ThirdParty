@@ -44,13 +44,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'showFooter'=>true,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            'id',
+          
             [
                 'attribute' => 'user_id',
                 'label' => '用户名称',
                 'value' => function($model) {
                     $connection = Yii::$app->db;
-                    $command = $connection->createCommand('SELECT * FROM user WHERE id=' . $model->user_id);
+                    $command = $connection->createCommand('SELECT * FROM user WHERE id=' . $model->sign_user_id);
                     $user = $command->queryOne();
                     return $user['company_name'];
                 }

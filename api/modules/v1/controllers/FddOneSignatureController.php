@@ -151,7 +151,7 @@ class FddOneSignatureController extends ActiveController{
             }
             $parameter_map[$value->dict_name]=$dic_value;
         }
-        
+        //个人用户是否存在（添加法大大的CA）
         $user_model=new GrUser;
         $user_rec= $user_model->find()->where(['id_card'=>$id_card])->one();
    
