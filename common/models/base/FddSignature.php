@@ -38,7 +38,7 @@ class FddSignature extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'client_role', 'status', 'updated_at', 'created_at'], 'integer'],
+            [['user_id','sign_user_id', 'client_role', 'status', 'updated_at', 'created_at'], 'integer'],
             [['transaction_id', 'contract_id', 'customer_id'], 'string', 'max' => 32],
             [['doc_title', 'sign_keyword'], 'string', 'max' => 125],
             [['download_url', 'viewpdf_url'], 'string', 'max' => 255],

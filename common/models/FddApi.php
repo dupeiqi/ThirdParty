@@ -146,7 +146,7 @@ class FddApi extends FddBase {
      * @param dynamic_tables 动态表单
      * @return
      */
-    public function invokeGenerateContract($template_id, $contract_id, $doc_title, $parameter_map, $font_size = '', $font_type = '', $dynamic_tables = '') {
+    public function invokeGenerateContract($template_id, $contract_id, $doc_title, $parameter_map, $font_size = 14, $font_type = 4, $dynamic_tables = '') {
 
         if (empty($contract_id) || empty($template_id) || empty($doc_title)||empty($parameter_map)) {
            return ['code'=>'4004','msg'=>'必填字段为空值！'];
@@ -219,7 +219,7 @@ class FddApi extends FddBase {
         //获取URL
         $url = $this->getURLOfExtSign();
         //组合访问网址
-        $get_url = $url . "?timestamp=" . $timpstamp . "&transaction_id=" . $params['transaction_id'] . "&contract_id=" . $params['contract_id'] . "" . "&return_url=" . urlencode($params['return_url']) . " &customer_id=" . $params['customer_id'] . "" . "&doc_title=" . urlencode($params['doc_title']) . "" . "&app_id=" . $params['app_id'] . "&msg_digest=" . $params['msg_digest'] . "&v=2.0";
+        $get_url = $url . "?timestamp=" . $timpstamp . "&transaction_id=" . $params['transaction_id'] . "&contract_id=" . $params['contract_id'] . "" . "&return_url=".urlencode($params['return_url'])."&customer_id=" . $params['customer_id'] . "" . "&doc_title=" . urlencode($params['doc_title']) . "" . "&app_id=" . $params['app_id'] . "&msg_digest=" . $params['msg_digest'] . "&v=2.0";
 
         return $get_url;
     }

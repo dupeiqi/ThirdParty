@@ -33,8 +33,9 @@ class FddContract extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'status', 'updated_at', 'created_at'], 'integer'],
-            [['contract_id'], 'string', 'max' => 32],
+            [['user_id','sign_user_id', 'status', 'updated_at', 'created_at'], 'integer'],
+            [['contract_id','template_id'], 'string', 'max' => 32],
+            [['parameter'], 'string', 'max' => 1000],
             [['doc_title', 'file'], 'string', 'max' => 125],
             [['timestamp'], 'string', 'max' => 16],
         ];
@@ -49,6 +50,8 @@ class FddContract extends \yii\db\ActiveRecord
             'id' => 'ID',
             'user_id' => '企业Id或用户id',
             'contract_id' => '合同ID',
+            'template_id' => '模版ID',
+            'parameter'=>'填充内容',
             'doc_title' => '合同标题',
             'file' => '合同文件',
             'timestamp' => '请示时间',

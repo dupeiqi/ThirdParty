@@ -8,7 +8,8 @@ class m170801_092622_create_table_fdd_signature extends Migration
         if (!(Yii::$app->db->getTableSchema('fdd_signature'))) {
             $this->createTable('fdd_signature', array(
                 'id' => "int NOT NULL AUTO_INCREMENT PRIMARY KEY",
-                'user_id' => "int(11) not null default '0' comment '企业Id或用户id'",
+                'user_id' => "int(11) not null default '0' comment '企业Id'",
+                'sign_user_id' => "int(11) not null default '0' comment '签署用户id'",
                 'transaction_id' => "varchar(32) NOT NULL default '' comment '交易号'",
                 'contract_id' => "varchar(32) NOT NULL default '' comment '合同ID'",
                 'customer_id' => "varchar(32) NOT NULL default '' comment '客户编号CA注册'",

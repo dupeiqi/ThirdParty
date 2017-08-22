@@ -14,7 +14,7 @@ class FddSignatureController extends ActiveController{
     
     public $modelClass = 'common\models\FddSignature';
     //文件路途
-    public $pathfile= 'D:/webroot/ThirdParty/uploads';
+    public $pathfile;
     //页面跳转
     public  $return_url='http://api.signature.com/v1/fddurl/return-url';
     
@@ -32,8 +32,11 @@ class FddSignatureController extends ActiveController{
                 ]
             ]
         ];
+        $this->pathfile=\Yii::$app->params['fddConfig']['file_path'];
         return ArrayHelper::merge($parent, $son);
     }
+    
+
     
      /**
      * 文档传输接口
@@ -284,8 +287,47 @@ class FddSignatureController extends ActiveController{
         
     }
     
-    
+    /**
+     * 查看公司模版文件
+
+     */
+     public function actionTemplateShow(){
        
+        $user_id=Yii::$app->user->id;
+
+        if (empty($user_id)) {
+            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+        }
+
+        $model= \common\models\FddTemplate::find()->where(['user_id'=>$user_id,'visible'=>1])->select(array('id', 'template_id', 'template_name'))->all();
+        return JsonYll::encode(JsonYll::SUCCESS,'查询成功',$model, '200');        
+       
+        
+    }
+      /**
+     * 查看模版数据字典文件
+
+     */
+     public function actionDictShow(){
+       
+        $user_id=Yii::$app->user->id;
+
+        if (empty($user_id)) {
+            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+        }
+        $template_id=Yii::$app->request->get("template_id");
+
+        if (empty($template_id)) {
+            return JsonYll::encode('40010', '模版ID不能为空.', [], '200');
+        }
+        $model= \common\models\DataDict::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'visible'=>1])->select(array('id', 'dict_name', 'dict_value'))->all();
+        return JsonYll::encode(JsonYll::SUCCESS,'查询成功',$model, '200');        
+       
+        
+    }
+    
+   
+    
     public function getRand()
     {
         $time = explode (" ", microtime () );
