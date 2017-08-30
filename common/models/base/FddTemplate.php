@@ -34,7 +34,7 @@ class FddTemplate extends \yii\db\ActiveRecord
         return [
             [['user_id', 'visible', 'updated_at', 'created_at'], 'integer'],
             [['template_name'], 'string', 'max' => 50],
-            [['template_file'], 'string', 'max' => 125],
+            [['template_file','sign_keyword'], 'string', 'max' => 125],
             [['template_id'], 'string', 'max' => 32],
         ];
     }
@@ -48,6 +48,7 @@ class FddTemplate extends \yii\db\ActiveRecord
            'id' => 'ID',
             'user_id' => '用户ID',
             'template_name' => '模版名称',
+            'sign_keyword' => '公司定位关键字',
             'template_file' => '模版文件',
             'template_id' => '模版ID',
             'visible' => '是否可用',

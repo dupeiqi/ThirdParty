@@ -326,7 +326,42 @@ class FddSignatureController extends ActiveController{
         
     }
     
-   
+    /**
+     * 查看公司或个人是否签署
+
+     */
+     public function actionSignShow(){
+       
+        $user_id=Yii::$app->user->id;
+
+        if (empty($user_id)) {
+            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+        }
+        $template_id=Yii::$app->request->get("template_id");
+
+        if (empty($template_id)) {
+            return JsonYll::encode('40010', '模版ID不能为空.', [], '200');
+        }
+        $id_card=Yii::$app->request->get("id_card");
+        if (empty($id_card)) {
+            return JsonYll::encode('40010', '个人用户身份证ID不能为空.', [], '200');
+        }
+        //个人用户是否存在（添加法大大的CA）
+        $user_rec= \common\models\GrUser::find()->where(['id_card'=>$id_card])->one();
+        if (empty($user_rec->id)) {
+            return JsonYll::encode('40010', '没有找到该用户.', [], '200');
+        }
+        $sign_user_id=$user_rec->id;
+        $model= FddContract::findOne(['user_id'=>$user_id,'template_id'=>$template_id,'sign_user_id'=>$sign_user_id]);
+        if (!empty($model->contract_id)){
+            return JsonYll::encode(JsonYll::SUCCESS,'查询成功',['contract_id'=>$model->contract_id], '200');  
+        }else{
+            return JsonYll::encode(JsonYll::FAIL, '用户没有签署合同.', [], '200'); 
+        }
+              
+       
+        
+    }
     
     public function getRand()
     {

@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
     <label class="control-label" for="fddtemplate-template_name">公司名称</label> 
     <?=Html::activeDropDownList($model, 'user_id', ArrayHelper::map($data,'id', 'company_name'),['prompt'=>'请选择公司','class'=>'form-control']);?>
     <?= $form->field($model, 'template_name')->textInput(['maxlength' => true])->label('模版名称') ?>
-   
+    <?= $form->field($model, 'sign_keyword')->textInput(['maxlength' => true])->label('公司定位关键字') ?>
     <?= $form->field($model, 'template_file')->fileInput() ?>
     <label class="control-label" for="fddtemplate-template_file">模版文件:
     <?php 

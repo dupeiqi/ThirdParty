@@ -39,6 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'template_name',
+            'sign_keyword',
             'template_file',
             'template_id',
              [

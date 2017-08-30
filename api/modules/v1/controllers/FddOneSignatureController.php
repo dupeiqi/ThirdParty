@@ -127,11 +127,7 @@ class FddOneSignatureController extends ActiveController{
             return JsonYll::encode('40010', '签约用户手机不能为空.', [], '200');
         }
 
-        $sign_keyword=Yii::$app->request->post("sign_keyword");
 
-        if (empty($sign_keyword)) {
-            return JsonYll::encode('40010', '企业定位关键字不能为空.', [], '200');
-        }
         
         //判断用户模版是否存在
         $tp_rec= \common\models\FddTemplate::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'visible'=>1])->select(array('id', 'template_id', 'template_name','template_file'))->one();
@@ -139,7 +135,11 @@ class FddOneSignatureController extends ActiveController{
         if (empty($tp_rec->id)){
             return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
         } 
-        
+        $sign_keyword=$tp_rec->sign_keyword;
+
+        if (empty($sign_keyword)) {
+            return JsonYll::encode('40010', '企业定位关键字不能为空.', [], '200');
+        }
         //模版字典
         $dic_rec= \common\models\DataDict::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'visible'=>1])->select(array('id', 'dict_name', 'dict_value'))->all();
         $parameter_map=array();  //填充内容

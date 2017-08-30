@@ -4,7 +4,7 @@ use yii\db\Migration;
 
 class m170802_034605_add_column_user extends Migration
 {
-    public function Up()
+    public function safeUp()
     {
         if (!isset(Yii::$app->db->getTableSchema('user')->columns['id_card'])) {           
              $this->addColumn('user', 'id_card', 'varchar(32) not null default "" COMMENT "身份证" after company_name');
