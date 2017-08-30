@@ -108,9 +108,9 @@ class FddOneSignatureController extends ActiveController{
      
         $template_id=Yii::$app->request->post("template_id");
 
-        if (empty($template_id)) {
-            return JsonYll::encode('40010', '模版ID不能为空.', [], '200');
-        }
+//        if (empty($template_id)) {
+//            return JsonYll::encode('40010', '模版ID不能为空.', [], '200');
+//        }
         $user_name=Yii::$app->request->post("user_name");
 
         if (empty($user_name)) {
@@ -127,14 +127,27 @@ class FddOneSignatureController extends ActiveController{
             return JsonYll::encode('40010', '签约用户手机不能为空.', [], '200');
         }
 
+        if (empty($template_id)) {
+            $count_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'visible' => 1])->count();
+            if ($count_rec == 1) {  //是为公司唯一一个模版
+                $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file'))->one();
+                if (empty($tp_rec->id)) {
+                    return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
+                }
+            } else {
+                return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
+            }
+        } else {
+            //判断用户模版是否存在
+            $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'template_id' => $template_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file'))->one();
 
-        
-        //判断用户模版是否存在
-        $tp_rec= \common\models\FddTemplate::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'visible'=>1])->select(array('id', 'template_id', 'template_name','template_file'))->one();
-      
-        if (empty($tp_rec->id)){
-            return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
-        } 
+            if (empty($tp_rec->id)) {
+                return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
+            }
+        }
+
+
+
         $sign_keyword=$tp_rec->sign_keyword;
 
         if (empty($sign_keyword)) {
