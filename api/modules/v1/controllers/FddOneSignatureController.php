@@ -130,7 +130,7 @@ class FddOneSignatureController extends ActiveController{
         if (empty($template_id)) {
             $count_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'visible' => 1])->count();
             if ($count_rec == 1) {  //是为公司唯一一个模版
-                $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file'))->one();
+                $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file','sign_keyword'))->one();
                 if (empty($tp_rec->id)) {
                     return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
                 }
@@ -139,14 +139,12 @@ class FddOneSignatureController extends ActiveController{
             }
         } else {
             //判断用户模版是否存在
-            $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'template_id' => $template_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file'))->one();
+            $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'template_id' => $template_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file','sign_keyword'))->one();
 
             if (empty($tp_rec->id)) {
                 return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
             }
         }
-
-
 
         $sign_keyword=$tp_rec->sign_keyword;
 
@@ -154,7 +152,11 @@ class FddOneSignatureController extends ActiveController{
             return JsonYll::encode('40010', '企业定位关键字不能为空.', [], '200');
         }
         //模版字典
+        
         $dic_rec= \common\models\DataDict::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'visible'=>1])->select(array('id', 'dict_name', 'dict_value'))->all();
+        if (empty($dic_rec)){
+             return JsonYll::encode('40010', '模版数据字典不能为空.', [], '200');
+        }
         $parameter_map=array();  //填充内容
         foreach ($dic_rec as $value){
             $dic_value=Yii::$app->request->post($value->dict_name);
@@ -164,13 +166,14 @@ class FddOneSignatureController extends ActiveController{
             }
             $parameter_map[$value->dict_name]=$dic_value;
         }
+        
         //个人用户是否存在（添加法大大的CA）
         $user_model=new GrUser;
-        $user_rec= $user_model->find()->where(['id_card'=>$id_card])->one();
+        $user_rec= $user_model->find()->where(['id_card'=>$id_card,'company_name'=>$user_name,'mobile'=>$user_mobile])->one();
    
         if (empty($user_rec->id)){
             $fdd=new FddApi();
-            //获取法大大CA
+            //获取法大大CA           
             $ret= json_decode($fdd->invokeSyncPersonAuto($user_name, $user_mobile, $id_card),true);
             if ($ret['code']=='1000'){
                 
