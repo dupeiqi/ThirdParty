@@ -37,7 +37,7 @@ class FddurlController extends ActiveController {
         $secret=Yii::$app->params['fddConfig']['app_secret'];
         
         if ($fdd_data['result_code']!='3000'){
-            return JsonYll::encode('40012',$fdd_data['result_desc'], ['transaction_id'=>$fdd_data['transaction_id']], '200');
+            return JsonYll::encode(JsonYll::FAIL,$fdd_data['result_desc'], ['transaction_id'=>$fdd_data['transaction_id']], '40012');
         }
         //验证是否正确
        
@@ -57,14 +57,14 @@ class FddurlController extends ActiveController {
             //获取企业用户
             $user_rec = \common\models\base\User::findOne(['id' => $model->user_id]);
             if (empty($user_rec)) {
-                return JsonYll::encode('40010', '用户ID有误.', [], '200');
+                return JsonYll::encode(JsonYll::FAIL, '用户ID有误.', [], '40010');
             }
             $user_id = $model->user_id;
             $customer_id = $user_rec->fdd_ca;
             //获取合同数据
             $rsContract = \common\models\FddContract::findOne(['contract_id' => $model->contract_id, "status" => 1]);
             if (empty($rsContract)) {
-                return JsonYll::encode('40010', '合同已签署或没有生成.', [], '200');
+                return JsonYll::encode(JsonYll::FAIL, '合同已签署或没有生成.', [], '40010');
             }
             $doc_title = $rsContract->doc_title;
             $sign_keyword = $rsContract->sign_keyword;
@@ -76,7 +76,7 @@ class FddurlController extends ActiveController {
            
         }else{
            
-             return JsonYll::encode('40010','数据验证错误，请联系管理员', ['transaction_id'=>$fdd_data['transaction_id']], '200');
+             return JsonYll::encode(JsonYll::FAIL,'数据验证错误，请联系管理员', ['transaction_id'=>$fdd_data['transaction_id']], '40010');
         }
 
         exit;
@@ -101,20 +101,20 @@ class FddurlController extends ActiveController {
        
 
         if (empty($doc_title)) {
-            return JsonYll::encode('40010', '签署标题不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签署标题不能为空.', [], '40010');
         }
      
         if (empty($contract_id)) {
-            return JsonYll::encode('40010', '签署合同编号不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签署合同编号不能为空.', [], '40010');
         }     
        
 
         if (empty($customer_id)) {
-            return JsonYll::encode('40010', '签署客户编号CA不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签署客户编号CA不能为空.', [], '40010');
         }
 
         if (empty($sign_keyword)) {
-            return JsonYll::encode('40010', '定位关键字不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '定位关键字不能为空.', [], '40010');
         }
         
         $client_role =1;// Yii::$app->request->post('client_role');
@@ -157,7 +157,7 @@ class FddurlController extends ActiveController {
                     //合同归档
                    return $this->actionFiling($user_id, $contract_id, $ret['download_url'], $ret['viewpdf_url']);
                 } else {
-                    return JsonYll::encode('40010', $ret['msg'], ['transaction_id' => $transaction_id], '200');
+                    return JsonYll::encode(JsonYll::FAIL, $ret['msg'], ['transaction_id' => $transaction_id], '40010');
                 }
             }
         } else {
@@ -172,13 +172,13 @@ class FddurlController extends ActiveController {
      public function actionFiling($user_id,$contract_id,$download_url,$viewpdf_url) {
 
         if (empty($contract_id)) {
-            return JsonYll::encode('40010', '签署合同编号不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签署合同编号不能为空.', [], '40010');
         }
 
         $model = \common\models\FddContract::findOne(['contract_id' => $contract_id, 'user_id' => $user_id]);
 
         if (empty($model->id)) {
-            return JsonYll::encode('40010', '结案合同不是您发起的!', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '结案合同不是您发起的!', [], '40010');
         }
 
         $fdd = new FddApi();
@@ -192,7 +192,7 @@ class FddurlController extends ActiveController {
             return JsonYll::encode(JsonYll::SUCCESS, '合同归档成功！', ['contract_id' => $contract_id,'download_url'=>$download_url,'viewpdf_url'=>$viewpdf_url], '200');
            
         } else {
-            return JsonYll::encode('40010', $ret['msg'], ['contract_id' => $contract_id,'download_url'=>$download_url,'viewpdf_url'=>$viewpdf_url], '200');
+            return JsonYll::encode(JsonYll::FAIL, $ret['msg'], ['contract_id' => $contract_id,'download_url'=>$download_url,'viewpdf_url'=>$viewpdf_url], '40010');
         }
     }
     

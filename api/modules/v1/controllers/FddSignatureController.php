@@ -267,11 +267,11 @@ class FddSignatureController extends ActiveController{
      public function actionShow(){
        
         $user_id=Yii::$app->user->id;
-        $transaction_id=Yii::$app->request->post("transaction_id");
-        if (empty($transaction_id)) {
-            return JsonYll::encode('40010', '交易号不能为空.', [], '200');
+        $contract_id=Yii::$app->request->post("contract_id");
+        if (empty($contract_id)) {
+            return JsonYll::encode(JsonYll::FAIL, '合同号不能为空.', [], '40010');
         }
-        $model=FddSignature::findOne(['transaction_id'=>$transaction_id,'user_id'=>$user_id]);
+        $model=FddSignature::findOne(['contract_id'=>$contract_id,'sign_user_id'=>$user_id]);
         if (!empty($model->id)){
              $data=array();
              $data['doc_title']=$model->doc_title;
@@ -281,7 +281,7 @@ class FddSignatureController extends ActiveController{
              
              return JsonYll::encode(JsonYll::SUCCESS,'查询成功',$data, '200');
         }else{
-             return JsonYll::encode('40010', '查无此签署文件!.', [], '200');
+             return JsonYll::encode(JsonYll::FAIL, '查无此签署文件!.', [], '40010');
         }
        
         
@@ -296,7 +296,7 @@ class FddSignatureController extends ActiveController{
         $user_id=Yii::$app->user->id;
 
         if (empty($user_id)) {
-            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '用户ID不能为空.', [], '40010');
         }
         
         $model= \common\models\FddTemplate::find()->where(['user_id'=>$user_id,'visible'=>1])->select(array('id', 'template_id', 'template_name'))->all();
