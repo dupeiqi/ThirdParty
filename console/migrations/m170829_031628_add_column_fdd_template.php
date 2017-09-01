@@ -4,10 +4,13 @@ use yii\db\Migration;
 
 class m170829_031628_add_column_fdd_template extends Migration
 {
-    public function safeUp() {
+    public function Up() {
         
         if (!isset(Yii::$app->db->getTableSchema('fdd_template')->columns['sign_keyword'])) {
             $this->addColumn('fdd_template', 'sign_keyword', 'varchar(125) not null default "" COMMENT "定位关键字" after template_id');
+        }
+        if (!isset(Yii::$app->db->getTableSchema('fdd_template')->columns['params'])) {
+            $this->addColumn('fdd_template', 'params', 'varchar(255) not null default "" COMMENT "模版字典数据" after template_id');
         }
     }
 

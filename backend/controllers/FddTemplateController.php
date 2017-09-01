@@ -12,7 +12,7 @@ use common\models\FddTemplate;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use common\models\FddApi;
-
+use common\models\DataDict;
 /**
  * UserController implements the CRUD actions for User model.
  */
@@ -78,7 +78,7 @@ class FddTemplateController extends Controller
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             
             
-            
+          
             $template_file = UploadedFile::getInstances($model, 'template_file');
             if ($template_file) {
                 foreach ($template_file as $file) {
@@ -90,9 +90,9 @@ class FddTemplateController extends Controller
                     }
                 }
             }
-
+            $model->params= json_encode($model->params);
             if ($model->validate()) {
-                $template_id = "TP" . $this->getRand();
+                 $template_id = "TP" . $this->getRand();
                 $model->template_id = $template_id;
                 //    $model->save();
                 $file = $this->file_path . "/" . $model->template_file;
@@ -111,14 +111,24 @@ class FddTemplateController extends Controller
                 }
               
             }
-
+           
             return $this->redirect(['view', 'id' => $model->id]);
             exit;
         }
-
+      
+        $allParams = DataDict::find() -> select(['dict_name','id','dict_value']) -> indexBy('id') -> all();
+       
         $data = User::find()->All();
+        if (!empty($data->params)){
+             $dataDict= json_decode($data->params,true);
+        }else{
+             $dataDict= array();
+        }
+       
         return $this->render('create', [
                     'model' => $model,
+                    'allParams'=>$allParams,
+                    'dataDict'=>$dataDict,
                     'data' => $data,
         ]);
     }
@@ -148,7 +158,7 @@ class FddTemplateController extends Controller
             } else {
                 unset($model->template_file);
             }
-
+            $model->params= json_encode($model->params);
             if ($model->validate()) {
 
                 $model->update();
@@ -159,9 +169,20 @@ class FddTemplateController extends Controller
         }
 
         $data = User::find()->All();
+        if (!empty($model->params)) {
+            $dataDict = json_decode($model->params, true);
+        } else {
+            $dataDict = array();
+        }
+      
+        $allParams = DataDict::find()->select(['dict_name', 'id', 'dict_value'])->indexBy('id')->all();
 
+
+       
         return $this->render('update', [
                     'model' => $model,
+                    'allParams'=>$allParams,
+                    'dataDict'=>$dataDict,
                     'data' => $data,
         ]);
     }

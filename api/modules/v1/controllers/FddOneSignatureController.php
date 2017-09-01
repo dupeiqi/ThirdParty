@@ -103,66 +103,57 @@ class FddOneSignatureController extends ActiveController{
           $user_id=Yii::$app->user->id;
         
         if (empty($user_id)) {
-            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '用户ID不能为空.', [], '40010');
         }
      
-        $template_id=Yii::$app->request->post("template_id");
-
-//        if (empty($template_id)) {
-//            return JsonYll::encode('40010', '模版ID不能为空.', [], '200');
-//        }
         $user_name=Yii::$app->request->post("user_name");
 
         if (empty($user_name)) {
-            return JsonYll::encode('40010', '签约用户名称不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签约用户名称不能为空.', [], '40010');
         }
         $id_card=Yii::$app->request->post("id_card");
 
         if (empty($id_card)) {
-            return JsonYll::encode('40010', '签约用户身份证不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签约用户身份证不能为空.', [], '40010');
         }
         $user_mobile=Yii::$app->request->post("user_mobile");
 
         if (empty($user_mobile)) {
-            return JsonYll::encode('40010', '签约用户手机不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签约用户手机不能为空.', [], '40010');
         }
-
-        if (empty($template_id)) {
-            $count_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'visible' => 1])->count();
-            if ($count_rec == 1) {  //是为公司唯一一个模版
-                $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file','sign_keyword'))->one();
-                if (empty($tp_rec->id)) {
-                    return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
-                }
-            } else {
-                return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
-            }
-        } else {
-            //判断用户模版是否存在
-            $tp_rec = \common\models\FddTemplate::find()->where(['user_id' => $user_id, 'template_id' => $template_id, 'visible' => 1])->select(array('id', 'template_id', 'template_name', 'template_file','sign_keyword'))->one();
-
-            if (empty($tp_rec->id)) {
-                return JsonYll::encode('40010', '您传的模版ID不误！.', [], '200');
-            }
-        }
-
+        
+        //获取模版记录
+        $template_id=Yii::$app->request->post("template_id");
+        $model=new \common\models\FddTemplate();
+        $tp_rec = $model->defaultTemplate($user_id,$template_id);
+      
+        if (empty($tp_rec->id)) {
+            return JsonYll::encode(JsonYll::FAIL, '模版ID不能为空.', [], '40010');
+        }       
+       
+        $template_id=$tp_rec->template_id;
         $sign_keyword=$tp_rec->sign_keyword;
 
         if (empty($sign_keyword)) {
-            return JsonYll::encode('40010', '企业定位关键字不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '企业定位关键字不能为空.', [], '40010');
         }
-        //模版字典
-        
-        $dic_rec= \common\models\DataDict::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'visible'=>1])->select(array('id', 'dict_name', 'dict_value'))->all();
+        $data_dict=$tp_rec->params;
+        if (empty($data_dict)){
+             return JsonYll::encode(JsonYll::FAIL, '模版数据参数不能为空.', [], '40010');
+        }else{
+            $tp_data_dict= json_decode($data_dict,true);
+        }
+        //模版字典        
+        $dic_rec= \common\models\DataDict::find()->where(['in','id',$tp_data_dict])->select(array('id', 'dict_name', 'dict_value'))->all();
         if (empty($dic_rec)){
-             return JsonYll::encode('40010', '模版数据字典不能为空.', [], '200');
+             return JsonYll::encode(JsonYll::FAIL, '模版数据字典不能为空.', [], '40010');
         }
         $parameter_map=array();  //填充内容
         foreach ($dic_rec as $value){
             $dic_value=Yii::$app->request->post($value->dict_name);
            
             if (empty($dic_value)) {
-                return JsonYll::encode('40010', $value->dict_value.'不能为空.', [], '200');
+                return JsonYll::encode(JsonYll::FAIL, $value->dict_value.'不能为空.', [], '40010');
             }
             $parameter_map[$value->dict_name]=$dic_value;
         }
@@ -183,13 +174,14 @@ class FddOneSignatureController extends ActiveController{
                 $user_model->company_name=$user_name;
                 $user_model->id_card=$id_card;
                 $user_model->mobile=$user_mobile;
+                $user_model->type=2;
                 $user_model->created_at=$user_model->updated_at=time();
                 $user_model->token=md5($user_name.$id_card.$user_model->created_at);
                 $user_model->save();
                 
                 $ge_user_id=$user_model->id;
             }else{
-               return JsonYll::encode('40010', $ret['msg'], [], '200');
+               return JsonYll::encode(JsonYll::FAIL, $ret['msg'], [], '40010');
             }
             
             
@@ -200,12 +192,12 @@ class FddOneSignatureController extends ActiveController{
         }
         
         if (empty($customer_id)) {
-            return JsonYll::encode('40010', '个人法大大CA不能为空,请联系管理员.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '个人法大大CA不能为空,请联系管理员.', [], '40010');
         }
         
         $cp_customer_id=Yii::$app->user->identity->fdd_ca;;  //企业法大大CA 
          if (empty($cp_customer_id)) {
-            return JsonYll::encode('40010', '企业法大大CA不能为空,请联系管理员.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '企业法大大CA不能为空,请联系管理员.', [], '40010');
         }
         
         $model = FddContract::findOne(['user_id' => $user_id,'sign_user_id'=>$ge_user_id, 'template_id' => $template_id]);
@@ -222,7 +214,7 @@ class FddOneSignatureController extends ActiveController{
             $model->template_id = $template_id;
             $model->parameter = json_encode($parameter_map);
             $model->sign_keyword = $sign_keyword;
-            $model->doc_title = $doc_title;
+            $model->doc_title = $doc_title;          
             $model->file = $this->pathfile . "/" . $tp_rec->template_file;
             $model->timestamp = date("YmdHis");
             $contractStatus = $model->save();
@@ -254,7 +246,7 @@ class FddOneSignatureController extends ActiveController{
                         return $sign_ret;
                     }
                 } else {
-                    return JsonYll::encode('40011', $jsondata['msg'], ['contract_id' => $contract_id, 'doc_title' => $tp_rec->template_name], '200');
+                    return JsonYll::encode(JsonYll::FAIL, $jsondata['msg'], ['contract_id' => $contract_id, 'doc_title' => $tp_rec->template_name], '40010');
                 }
             } else {
                 //获取手动签章网址

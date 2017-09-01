@@ -16,6 +16,8 @@ $this->params['breadcrumbs'][] = '修改';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'allParams'=>$allParams,
+        'dataDict'=>$dataDict,
         'data'=>$data,
     ]) ?>
 

@@ -36,6 +36,7 @@ class FddTemplate extends \yii\db\ActiveRecord
             [['template_name'], 'string', 'max' => 50],
             [['template_file','sign_keyword'], 'string', 'max' => 125],
             [['template_id'], 'string', 'max' => 32],
+            [['params'], 'string', 'max' => 255],
         ];
     }
 
@@ -51,6 +52,7 @@ class FddTemplate extends \yii\db\ActiveRecord
             'sign_keyword' => '公司定位关键字',
             'template_file' => '模版文件',
             'template_id' => '模版ID',
+            'params' => '模版字典数据',
             'visible' => '是否可用',
             'updated_at' => '更新时间',
             'created_at' => '创造时间',

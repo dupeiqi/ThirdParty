@@ -298,7 +298,7 @@ class FddSignatureController extends ActiveController{
         if (empty($user_id)) {
             return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
         }
-
+        
         $model= \common\models\FddTemplate::find()->where(['user_id'=>$user_id,'visible'=>1])->select(array('id', 'template_id', 'template_name'))->all();
         return JsonYll::encode(JsonYll::SUCCESS,'查询成功',$model, '200');        
        
@@ -313,15 +313,27 @@ class FddSignatureController extends ActiveController{
         $user_id=Yii::$app->user->id;
 
         if (empty($user_id)) {
-            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '用户ID不能为空.', [], '40010');
         }
-        $template_id=Yii::$app->request->get("template_id");
-
-        if (empty($template_id)) {
-            return JsonYll::encode('40010', '模版ID不能为空.', [], '200');
+        //获取模版记录
+        $template_id=Yii::$app->request->get("template_id");       
+        
+        $model=new \common\models\FddTemplate();
+        $tp_rec = $model->defaultTemplate($user_id,$template_id);
+      
+        if (empty($tp_rec)) {
+            return JsonYll::encode(JsonYll::FAIL, '模版ID不能为空.', [], '40010');
         }
-        $model= \common\models\DataDict::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'visible'=>1])->select(array('id', 'dict_name', 'dict_value'))->all();
-        return JsonYll::encode(JsonYll::SUCCESS,'查询成功',$model, '200');        
+    
+        if (empty($tp_rec->params)){
+             return JsonYll::encode(JsonYll::FAIL, '模版数据参数不能为空.', [], '40010');
+        }else{
+            $tp_data_dict= json_decode($tp_rec->params,true);
+        }
+        //模版字典        
+        $dic_rec= \common\models\DataDict::find()->where(['in','id',$tp_data_dict])->select(array('id', 'dict_name', 'dict_value'))->all();
+        
+        return JsonYll::encode(JsonYll::SUCCESS,'查询成功',$dic_rec, '200');        
        
         
     }
@@ -335,28 +347,43 @@ class FddSignatureController extends ActiveController{
         $user_id=Yii::$app->user->id;
 
         if (empty($user_id)) {
-            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '用户ID不能为空.', [], '40010');
         }
-        $template_id=Yii::$app->request->get("template_id");
-
-        if (empty($template_id)) {
-            return JsonYll::encode('40010', '模版ID不能为空.', [], '200');
-        }
+        
         $id_card=Yii::$app->request->get("id_card");
         if (empty($id_card)) {
-            return JsonYll::encode('40010', '个人用户身份证ID不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '个人用户身份证ID不能为空.', [], '40010');
+        }
+        $user_name=Yii::$app->request->get("user_name");
+        if (empty($user_name)) {
+            return JsonYll::encode(JsonYll::FAIL, '个人用户姓名不能为空.', [], '40010');
+        }
+        //获取模版记录
+        $template_id=Yii::$app->request->get("template_id");
+        $model=new \common\models\FddTemplate();
+        $tp_rec = $model->defaultTemplate($user_id,$template_id);
+      
+        if (empty($tp_rec->template_id)) {
+            return JsonYll::encode(JsonYll::FAIL, '模版ID不能为空.', [], '40010');
+        }else{
+            $template_id=$tp_rec->template_id;
         }
         //个人用户是否存在（添加法大大的CA）
-        $user_rec= \common\models\GrUser::find()->where(['id_card'=>$id_card])->one();
-        if (empty($user_rec->id)) {
-            return JsonYll::encode('40010', '没有找到该用户.', [], '200');
+        $user_rec= \common\models\GrUser::find()->where(['id_card'=>$id_card,'company_name'=>$user_name])->all();
+       
+        if (empty($user_rec[0]->id)) {
+            return JsonYll::encode(JsonYll::FAIL, '没有找到该用户.', [], '40010');
         }
-        $sign_user_id=$user_rec->id;
-        $model= FddContract::findOne(['user_id'=>$user_id,'template_id'=>$template_id,'sign_user_id'=>$sign_user_id]);
+        foreach ($user_rec as $key=>$value){            
+            $sign_user_id[]=$value['id'];
+        }
+        
+        $model=FddContract::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'sign_user_id'=>$sign_user_id])->one();
+         
         if (!empty($model->contract_id)){
             return JsonYll::encode(JsonYll::SUCCESS,'查询成功',['contract_id'=>$model->contract_id], '200');  
         }else{
-            return JsonYll::encode(JsonYll::FAIL, '用户没有签署合同.', [], '200'); 
+            return JsonYll::encode(JsonYll::FAIL, '用户没有签署合同.', [], '40010'); 
         }
               
        
