@@ -31,7 +31,7 @@ class User extends BaseUser {
 
         $this->created_at=$this->updated_at=time();
         $this->token=md5($this->company_name.$this->created_at);
-        var_dump($this);exit;
+     
         return $this->save();
     }
 
