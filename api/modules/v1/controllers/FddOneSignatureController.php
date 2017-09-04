@@ -45,21 +45,21 @@ class FddOneSignatureController extends ActiveController{
 
     
         if (empty($user_id)) {
-            return JsonYll::encode('40010', '用户ID不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '用户ID不能为空.', [], '40010');
         }
         
         if (empty($doc_title)) {
-            return JsonYll::encode('40010', '签署标题不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签署标题不能为空.', [], '40010');
         }
 
         if (empty($contract_id)) {
-            return JsonYll::encode('40010', '签署合同编号不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签署合同编号不能为空.', [], '40010');
         }
         $rsContract = FddContract::findOne(['contract_id' => $contract_id, "status" => 1]);
         $return_url = trim($this->return_url);
        
         if (empty($customer_id)) {
-            return JsonYll::encode('40010', '签署客户编号CA不能为空.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '签署客户编号CA不能为空.', [], '40010');
         }
      
         $transaction_id = "SG" . $this->getRand();
@@ -68,7 +68,7 @@ class FddOneSignatureController extends ActiveController{
         $model = FddSignature::findOne(['contract_id' => $contract_id, 'customer_id' => $customer_id]);             
         if (!empty($model->id)){
             if ($model->status==1){
-                return JsonYll::encode(JsonYll::FAIL, '些合同您已经签署过了.', [], '200');
+                return JsonYll::encode(JsonYll::SUCCESS, '些合同您已经签署过了.', ['contract_id' => $contract_id], '201');
             }
         }else{
             $model=new FddSignature();
@@ -89,7 +89,7 @@ class FddOneSignatureController extends ActiveController{
             return JsonYll::encode(JsonYll::SUCCESS, '成功！', ['url' => $get_url], '200');
           
         } else {
-            return JsonYll::encode(JsonYll::FAIL, '数据保存失败，请联系管理员.', [], '200');
+            return JsonYll::encode(JsonYll::FAIL, '数据保存失败，请联系管理员.', [], '40010');
         }
     }
 

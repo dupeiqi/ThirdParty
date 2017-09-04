@@ -9,6 +9,7 @@ return [
         'app_secret'=>'yzVLwz3D9pBWyASTiLZexmSO',
         //'url'=>'https://azuretestapi.fadada.com:8443/api/',
         'url'=>'https://testapi.fadada.com:8443/api/',
+        
         'version'=>'2.0',
         'file_path'=>'D:/webroot/ThirdParty/uploads',
     ]
