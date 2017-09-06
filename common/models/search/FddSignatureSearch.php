@@ -55,7 +55,7 @@ class FddSignatureSearch extends FddSignature
              $query->orFilterWhere(['transaction_id', $this->param]);
         }
 
-        $query -> orderBy(['id' => SORT_DESC]);
+        $query -> orderBy(['contract_id'=>SORT_DESC,'id' => SORT_DESC]);
 
         return $dataProvider;
     }
@@ -86,7 +86,7 @@ class FddSignatureSearch extends FddSignature
             $query->orFilterWhere(['transaction_id'=> $params['FddSignatureSearch']['param']]);
         }
         
-        $query -> orderBy(['id' => SORT_DESC]);
+        $query -> orderBy(['contract_id'=>SORT_DESC,'id' => SORT_DESC]);
 
 
         return $dataProvider;

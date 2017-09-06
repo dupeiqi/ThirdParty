@@ -8,12 +8,15 @@ use common\models\JsonYll;
 use yii\helpers\ArrayHelper;
 use common\models\FddSignature;
 use common\models\FddApi;
+use yii\log\Logger;
+ use yii\log\FileTarget;
 class FddurlController extends ActiveController {
     
     public $modelClass = 'common\models\FddSignature';
     
     public function behaviors()
     {
+        
         $parent = parent::behaviors();
         $son = [
            
@@ -54,6 +57,7 @@ class FddurlController extends ActiveController {
             $model->timestamp=$timestamp;
             $model->status=1;
             $ret=$model->save();
+            
             //获取企业用户
             $user_rec = \common\models\base\User::findOne(['id' => $model->user_id]);
             if (empty($user_rec)) {
@@ -61,18 +65,24 @@ class FddurlController extends ActiveController {
             }
             $user_id = $model->user_id;
             $customer_id = $user_rec->fdd_ca;
+            
             //获取合同数据
             $rsContract = \common\models\FddContract::findOne(['contract_id' => $model->contract_id, "status" => 1]);
             if (empty($rsContract)) {
                 return JsonYll::encode(JsonYll::FAIL, '合同已签署或没有生成.', [], '40010');
             }
+            
+            //修改合同编号状态（个人签署成功）
+            $rsContract->status=3;
+            $rsContract->save();
+            
             $doc_title = $rsContract->doc_title;
             $sign_keyword = $rsContract->sign_keyword;
             $contract_id=$rsContract->contract_id;
             
             //企业自动签署
-            return $this->actionAutoSign($user_id, $doc_title, $contract_id, $customer_id, $sign_keyword);
-          //  return JsonYll::encode(JsonYll::SUCCESS, '签署成功！', ['transaction_id'=>$fdd_data['transaction_id'],'download_url'=>$fdd_data['download_url'],'viewpdf_url'=>$fdd_data['viewpdf_url']], '200');
+          //  return $this->actionAutoSign($user_id, $doc_title, $contract_id, $customer_id, $sign_keyword);
+            return JsonYll::encode(JsonYll::SUCCESS, '签署成功！', ['transaction_id'=>$fdd_data['transaction_id'],'download_url'=>$fdd_data['download_url'],'viewpdf_url'=>$fdd_data['viewpdf_url']], '200');
            
         }else{
            
@@ -92,6 +102,41 @@ class FddurlController extends ActiveController {
     }
     
      /**
+     * 企业签署跑对列
+     */
+    public function actionFddList() {
+        $time = microtime(true);
+	$log = new FileTarget();
+	$log->logFile = Yii::$app->getRuntimePath() . '/logs/fdd_log.log';
+	
+	
+        
+        //获取个人签署合同数据
+        $rsContract = \common\models\FddContract::find()->where(["status" => 3])->all();
+        foreach ($rsContract as $key => $value) {
+            //获取企业用户
+            $user_rec = \common\models\base\User::findOne(['id' => $value->user_id]);
+            if (empty($user_rec)) {
+               $log->messages[] = [$value->user_id."合同编号：".$value->contract_id.'用户ID有误',1,'fdd',$time];
+               continue;
+            }
+          
+            $user_id = $value->user_id;
+            $customer_id = $user_rec->fdd_ca;
+            $doc_title = $value->doc_title;
+            $sign_keyword = $value->sign_keyword;
+            $contract_id = $value->contract_id;
+            $ret= ($this->actionAutoSign($user_id,$doc_title,$contract_id,$customer_id,$sign_keyword));
+            if ($ret['code']==0){
+               $log->messages[] = ["合同编号：".$value->contract_id."---错误信息：".json_encode($ret),1,'fdd',$time];
+            }
+        }
+        //写入日志
+        $log->export();
+        return "执行完成";
+    }
+
+    /**
      * 文档签署接口（自动签）
    
      */
@@ -99,7 +144,7 @@ class FddurlController extends ActiveController {
     private function actionAutoSign($user_id,$doc_title,$contract_id,$customer_id,$sign_keyword){
        
        
-
+       
         if (empty($doc_title)) {
             return JsonYll::encode(JsonYll::FAIL, '签署标题不能为空.', [], '40010');
         }
