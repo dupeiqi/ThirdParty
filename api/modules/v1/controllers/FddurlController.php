@@ -52,8 +52,8 @@ class FddurlController extends ActiveController {
         if ($msgDigest==$fdd_data['msg_digest']){
             //更改签署状态和合同地址
             $model=FddSignature::findOne(['transaction_id'=>$fdd_data['transaction_id']]);
-            $model->download_url=$fdd_data['download_url'];
-            $model->viewpdf_url=$fdd_data['viewpdf_url'];
+            $model->download_url=urldecode($fdd_data['download_url']);
+            $model->viewpdf_url=urldecode($fdd_data['viewpdf_url']);
             $model->timestamp=$timestamp;
             $model->status=1;
             $ret=$model->save();
@@ -98,7 +98,8 @@ class FddurlController extends ActiveController {
      * 法大大异步返回
      */
     public function actionNotifyUrl() {
-       
+       $aaa='https://extapi.fadada.com/api2//viewdocs.action?app_id=000381&send_app_id=&v=2.0&timestamp=20170906141323&transaction_id=SG1504678388917921&msg_digest=NDQ5NTM4MTNGRTNBOTlEQzY1NEFDM0REMUEwNjUxM0FGMTgxMURCQw==';
+       echo strlen($aaa);
     }
     
      /**
