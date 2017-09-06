@@ -1,109 +1,23 @@
 <?php
-namespace api\modules\v1\controllers;
+namespace console\controllers;
 
 use Yii;
-use yii\rest\ActiveController;
-use yii\web\Response;
+use yii\console\Controller;
 use common\models\JsonYll;
 use yii\helpers\ArrayHelper;
 use common\models\FddSignature;
 use common\models\FddApi;
 use yii\log\FileTarget;
-class FddurlController extends ActiveController {
+class FddurlController extends Controller {
     
     public $modelClass = 'common\models\FddSignature';
-    
-    public function behaviors()
-    {
-        
-        $parent = parent::behaviors();
-        $son = [
-           
-            'contentNegotiator' => [
-                'formats' => [
-                    'text/html' => Response::FORMAT_JSON,
-                ]
-            ]
-        ];
-        return ArrayHelper::merge($parent, $son);
-    }
-    
-    /**
-     * 法大大返回
-     */
-    public function actionReturnUrl() {
-       //获取法大大推送信息
-        
-        $fdd_data=$_GET;
-        $appId=Yii::$app->params['fddConfig']['app_id'];
-        $secret=Yii::$app->params['fddConfig']['app_secret'];
-        
-        if ($fdd_data['result_code']!='3000'){
-            return JsonYll::encode(JsonYll::FAIL,$fdd_data['result_desc'], ['transaction_id'=>$fdd_data['transaction_id']], '40012');
-        }
-        //验证是否正确
-       
-        $timestamp = $fdd_data['timestamp'];
-        $sha1 = strtoupper(sha1($secret . $fdd_data['transaction_id']));
-        $md5 = strtoupper(md5($timestamp));
-        $sha2 = strtoupper(sha1($appId . $md5 . $sha1));
-        $msgDigest = base64_encode($sha2);
-        if ($msgDigest==$fdd_data['msg_digest']){
-            //更改签署状态和合同地址
-            $model=FddSignature::findOne(['transaction_id'=>$fdd_data['transaction_id']]);
-            $model->download_url=urldecode($fdd_data['download_url']);
-            $model->viewpdf_url=urldecode($fdd_data['viewpdf_url']);
-            $model->timestamp=$timestamp;
-            $model->status=1;
-            $ret=$model->save();
-            
-            //获取企业用户
-            $user_rec = \common\models\base\User::findOne(['id' => $model->user_id]);
-            if (empty($user_rec)) {
-                return JsonYll::encode(JsonYll::FAIL, '用户ID有误.', [], '40010');
-            }
-            $user_id = $model->user_id;
-            $customer_id = $user_rec->fdd_ca;
-            
-            //获取合同数据
-            $rsContract = \common\models\FddContract::findOne(['contract_id' => $model->contract_id, "status" => 1]);
-            if (empty($rsContract)) {
-                return JsonYll::encode(JsonYll::FAIL, '合同已签署或没有生成.', [], '40010');
-            }
-            
-            //修改合同编号状态（个人签署成功）
-            $rsContract->status=3;
-            $rsContract->save();
-            
-            $doc_title = $rsContract->doc_title;
-            $sign_keyword = $rsContract->sign_keyword;
-            $contract_id=$rsContract->contract_id;
-            
-            //企业自动签署
-          //  return $this->actionAutoSign($user_id, $doc_title, $contract_id, $customer_id, $sign_keyword);
-            return JsonYll::encode(JsonYll::SUCCESS, '签署成功！', ['transaction_id'=>$fdd_data['transaction_id'],'download_url'=>$fdd_data['download_url'],'viewpdf_url'=>$fdd_data['viewpdf_url']], '200');
-           
-        }else{
-           
-             return JsonYll::encode(JsonYll::FAIL,'数据验证错误，请联系管理员', ['transaction_id'=>$fdd_data['transaction_id']], '40010');
-        }
-
-        exit;
-    }
-    
-    
-
-    /**
-     * 法大大异步返回
-     */
-    public function actionNotifyUrl() {
-
-    }
-    
+   
+      
      /**
      * 企业签署跑对列
      */
     public function actionFddList() {
+         set_time_limit(0);
         $time = microtime(true);
 	$log = new FileTarget();
 	$log->logFile = Yii::$app->getRuntimePath() . '/logs/fdd_log.log';
