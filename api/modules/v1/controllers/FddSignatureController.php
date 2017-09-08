@@ -316,7 +316,7 @@ class FddSignatureController extends ActiveController{
             return JsonYll::encode(JsonYll::FAIL, '用户ID不能为空.', [], '40010');
         }
         //获取模版记录
-        $template_id=Yii::$app->request->get("template_id");       
+        $template_id=Yii::$app->request->post("template_id");       
         
         $model=new \common\models\FddTemplate();
         $tp_rec = $model->defaultTemplate($user_id,$template_id);
@@ -350,16 +350,17 @@ class FddSignatureController extends ActiveController{
             return JsonYll::encode(JsonYll::FAIL, '用户ID不能为空.', [], '40010');
         }
         
-        $id_card=Yii::$app->request->get("id_card");
+        $id_card=Yii::$app->request->post("id_card");
+       
         if (empty($id_card)) {
             return JsonYll::encode(JsonYll::FAIL, '个人用户身份证ID不能为空.', [], '40010');
         }
-        $user_name=Yii::$app->request->get("user_name");
+        $user_name=Yii::$app->request->post("user_name");
         if (empty($user_name)) {
             return JsonYll::encode(JsonYll::FAIL, '个人用户姓名不能为空.', [], '40010');
         }
         //获取模版记录
-        $template_id=Yii::$app->request->get("template_id");
+        $template_id=Yii::$app->request->post("template_id");
         $model=new \common\models\FddTemplate();
         $tp_rec = $model->defaultTemplate($user_id,$template_id);
       
@@ -368,6 +369,7 @@ class FddSignatureController extends ActiveController{
         }else{
             $template_id=$tp_rec->template_id;
         }
+   
         //个人用户是否存在（添加法大大的CA）
         $user_rec= \common\models\GrUser::find()->where(['id_card'=>$id_card,'company_name'=>$user_name])->all();
        
@@ -378,10 +380,11 @@ class FddSignatureController extends ActiveController{
             $sign_user_id[]=$value['id'];
         }
         
-        $model=FddContract::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'sign_user_id'=>$sign_user_id])->one();
+        $model=FddContract::find()->where(['user_id'=>$user_id,'template_id'=>$template_id,'sign_user_id'=>$sign_user_id,'status'=>[2,3]])->one();
          
         if (!empty($model->contract_id)){
             return JsonYll::encode(JsonYll::SUCCESS,'查询成功',['contract_id'=>$model->contract_id], '200');  
+            
         }else{
             return JsonYll::encode(JsonYll::FAIL, '用户没有签署合同.', [], '40010'); 
         }

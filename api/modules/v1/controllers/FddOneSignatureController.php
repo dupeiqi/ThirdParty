@@ -143,20 +143,26 @@ class FddOneSignatureController extends ActiveController{
         }else{
             $tp_data_dict= json_decode($data_dict,true);
         }
-        //模版字典        
-        $dic_rec= \common\models\DataDict::find()->where(['in','id',$tp_data_dict])->select(array('id', 'dict_name', 'dict_value'))->all();
-        if (empty($dic_rec)){
-             return JsonYll::encode(JsonYll::FAIL, '模版数据字典不能为空.', [], '40010');
-        }
-        $parameter_map=array();  //填充内容
-        foreach ($dic_rec as $value){
-            $dic_value=Yii::$app->request->post($value->dict_name);
-           
-            if (empty($dic_value)) {
-                return JsonYll::encode(JsonYll::FAIL, $value->dict_value.'不能为空.', [], '40010');
-            }
-            $parameter_map[$value->dict_name]=$dic_value;
-        }
+        
+//        //模版字典        
+//        $dic_rec= \common\models\DataDict::find()->where(['in','id',$tp_data_dict])->select(array('id', 'dict_name', 'dict_value'))->all();
+//        if (empty($dic_rec)){
+//             return JsonYll::encode(JsonYll::FAIL, '模版数据字典不能为空.', [], '40010');
+//        }
+//        $parameter_map=array();  //填充内容
+//        foreach ($dic_rec as $value){
+//            $dic_value=Yii::$app->request->post($value->dict_name);
+//           
+//            if (empty($dic_value)) {
+//                return JsonYll::encode(JsonYll::FAIL, $value->dict_value.'不能为空.', [], '40010');
+//            }
+//            $parameter_map[$value->dict_name]=$dic_value;
+//        }
+        
+        //特殊
+        $parameter_map['platformName']=Yii::$app->user->identity->company_name;
+        $parameter_map['borrower']=$user_name;
+        $parameter_map['homeUrl']='http://www.qianbitou.cn';
         
         //个人用户是否存在（添加法大大的CA）
         $user_model=new GrUser;
