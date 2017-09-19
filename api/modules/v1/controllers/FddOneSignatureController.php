@@ -16,7 +16,7 @@ class FddOneSignatureController extends ActiveController{
     //文件路途
     public $pathfile;
     //页面跳转
-    public  $return_url='http://api.signature.com/v1/fddurl/return-url';
+    public  $return_url='http://thirdapi.qianbitou.cn/v1/fddurl/return-url';//http://api.signature.com/v1/fddurl/return-url';
     
     public function behaviors()
     {
