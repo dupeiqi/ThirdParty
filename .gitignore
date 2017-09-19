@@ -45,6 +45,11 @@ phpunit.phar
 /frontend/cache/
 /api/runtime
 
+
+/common/config/
+/backend/config/
+/frontend/config/
+
 /uploads/
 
 # vagrant runtime
