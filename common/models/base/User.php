@@ -33,7 +33,7 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'status', 'updated_at', 'created_at'], 'integer'],
+            [['type','is_auto', 'status', 'updated_at', 'created_at'], 'integer'],
             [['mobile'],'match','pattern'=>'/^1[3|4|5|7|8]\d{9}$/','message'=>'手机格式不正确!'],
             [['company_name', 'token'], 'string', 'max' => 125],
             [['id_card','fdd_ca'], 'string', 'max' => 32],
@@ -53,6 +53,7 @@ class User extends \yii\db\ActiveRecord
             'token' => 'Token',
             'fdd_ca' => '法大大CA',
             'type' => '类行',
+            'is_auto' => '是否签章',
             'status' => '状态',
             'updated_at' => '更新时间',
             'created_at' => '创建时间',
