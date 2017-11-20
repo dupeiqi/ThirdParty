@@ -34,6 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id_card',
             'fdd_ca',
             'token',
+            'is_auto',
             'status',
             'updated_at',
             'created_at',

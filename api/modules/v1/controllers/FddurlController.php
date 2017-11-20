@@ -113,12 +113,12 @@ class FddurlController extends ActiveController {
     public function actionFddList() {
         $time = microtime(true);
 	$log = new FileTarget();
-	$log->logFile = Yii::$app->getRuntimePath() . '/logs/fdd_log.log';
+	$log->logFile = Yii::$app->getRuntimePath() . '/logs/fdd_log.log';	
 	
-	
-        
+ 
         //获取个人签署合同数据
         $rsContract = \common\models\FddContract::find()->where(["status" => 3])->all();
+      //  print_r($rsContract);
         foreach ($rsContract as $key => $value) {
             //获取企业用户
             $user_rec = \common\models\base\User::findOne(['id' => $value->user_id]);
@@ -126,6 +126,12 @@ class FddurlController extends ActiveController {
                $log->messages[] = [$value->user_id."合同编号：".$value->contract_id.'用户ID有误',1,'fdd',$time];
                continue;
             }
+           
+            if ($user_rec->is_auto==2){  //手动签署
+                 $log->messages[] = [$value->user_id."合同编号：".$value->contract_id.'手动签署',1,'fdd',$time];
+                 continue;
+            }
+            
           
             $user_id = $value->user_id;
             $customer_id = $user_rec->fdd_ca;
