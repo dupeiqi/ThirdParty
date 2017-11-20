@@ -41,6 +41,7 @@ class FddurlController extends ActiveController {
         if ($fdd_data['result_code']!='3000'){
            // return JsonYll::encode(JsonYll::FAIL,$fdd_data['result_desc'], ['transaction_id'=>$fdd_data['transaction_id']], '40012');
             echo "数据验证错误，请联系管理员";
+            exit;
         }
         //验证是否正确
        
@@ -63,15 +64,17 @@ class FddurlController extends ActiveController {
             if (empty($user_rec)) {
               //  return JsonYll::encode(JsonYll::FAIL, '用户ID有误.', [], '40010');
                 echo '数据验证错误，请联系管理员.';
+                exit;
             }
             $user_id = $model->user_id;
             $customer_id = $user_rec->fdd_ca;
             
             //获取合同数据
-            $rsContract = \common\models\FddContract::findOne(['contract_id' => $model->contract_id, "status" => 1]);
+            $rsContract = \common\models\FddContract::findOne(['contract_id' => $model->contract_id, "status" => 1]);           
             if (empty($rsContract)) {
               //  return JsonYll::encode(JsonYll::FAIL, '合同已签署或没有生成.', [], '40010');
-                echo '数据验证错误，请联系管理员.';
+                echo '合同已签署或没有生成，请联系管理员.';
+                exit;
             }
             
             //修改合同编号状态（个人签署成功）

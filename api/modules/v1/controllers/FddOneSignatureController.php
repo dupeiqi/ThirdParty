@@ -16,8 +16,7 @@ class FddOneSignatureController extends ActiveController{
     //文件路途
     public $pathfile;
     //页面跳转
-   // public  $return_url='http://thirdapi.qianbitou.cn/v1/fddurl/return-url';
-    public  $return_url='http://api.signature.com/v1/fddurl/return-url';
+    public  $return_url='http://thirdapi.qianbitou.cn/v1/fddurl/return-url';
     public function behaviors()
     {
         $parent = parent::behaviors();
@@ -41,7 +40,7 @@ class FddOneSignatureController extends ActiveController{
      * 文档签署接口（手动签）
 
      */
-    public function actionSign($user_id,$doc_title,$contract_id,$customer_id,$sign_keyword='') {
+    public function actionSign($user_id,$doc_title,$contract_id,$customer_id,$sign_keyword='',$user_token='') {
 
     
         if (empty($user_id)) {
@@ -86,7 +85,7 @@ class FddOneSignatureController extends ActiveController{
         if ($signStatus) {
             $fdd = new FddApi();
             $get_url = $fdd->invokeExtSign($transaction_id, $customer_id, $contract_id, $doc_title, $return_url, $sign_keyword);
-            return JsonYll::encode(JsonYll::SUCCESS, '成功！', ['url' => $get_url], '200');
+            return JsonYll::encode(JsonYll::SUCCESS, '成功！', ['url' => $get_url,'contract_id'=>$contract_id,'user_token'=>$user_token], '200');
           
         } else {
             return JsonYll::encode(JsonYll::FAIL, '数据保存失败，请联系管理员.', [], '40010');
@@ -356,6 +355,7 @@ class FddOneSignatureController extends ActiveController{
                 $user_model->save();
                 
                 $ge_user_id=$user_model->id;
+                $user_token=$user_model->token;
             }else{
                return JsonYll::encode(JsonYll::FAIL, $ret['msg'], [], '40010');
             }
@@ -365,6 +365,7 @@ class FddOneSignatureController extends ActiveController{
         }else{
             $customer_id=$user_rec->fdd_ca;  //法大大个人CA 
             $ge_user_id=$user_rec->id;
+            $user_token=$user_rec->token;
         }
         
         if (empty($customer_id)) {
@@ -408,13 +409,13 @@ class FddOneSignatureController extends ActiveController{
             if (empty($model->status)) {  //是否请求法大大成功
                 //请求法大大接口
                 $fdd = new FddApi();
-                $jsondata = json_decode($fdd->invokeGenerateContract($template_id, $contract_id, $doc_title, json_encode($parameter_map), 14, 4, ''), true);
+                $jsondata = json_decode($fdd->invokeGenerateContract($template_id, $contract_id, $doc_title, $parameter_map, 12, 4, ''), true);
                 if ($jsondata['code'] == '1000') {
 
                     $model->status = 1;
                     $model->save();
                     //获取手动签章网址
-                    $sign_ret = $this->actionSign($ge_user_id, $doc_title, $contract_id, $customer_id, '');
+                    $sign_ret = $this->actionSign($ge_user_id, $doc_title, $contract_id, $customer_id, '',$user_token);
                     if ($sign_ret['code'] == 1) {
                         //  $this->redirect($sign_ret['url']);
                         return $sign_ret;
@@ -426,7 +427,7 @@ class FddOneSignatureController extends ActiveController{
                 }
             } else {
                 //获取手动签章网址
-                $sign_ret = $this->actionSign($ge_user_id, $doc_title, $contract_id, $customer_id, '');
+                $sign_ret = $this->actionSign($ge_user_id, $doc_title, $contract_id, $customer_id, '',$user_token);
 
                 if ($sign_ret['code'] == 1) {
                     //  $this->redirect($sign_ret['url']);
