@@ -377,7 +377,7 @@ class FddOneSignatureController extends ActiveController{
             return JsonYll::encode(JsonYll::FAIL, '企业法大大CA不能为空,请联系管理员.', [], '40010');
         }
         
-        $model = FddContract::findOne(['user_id' => $user_id,'sign_user_id'=>$ge_user_id, 'template_id' => $template_id]);
+        $model = FddContract::findOne(['user_id' => $user_id,'sign_user_id'=>$ge_user_id, 'template_id' => $template_id,'status'=>1]);
         if (empty($model->id)) {
             //合同编号
             $contract_id = "HT" . $this->getRand();
