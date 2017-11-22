@@ -308,14 +308,31 @@ class FddOneSignatureController extends ActiveController{
         if (empty($sign_keyword)) {
             return JsonYll::encode(JsonYll::FAIL, '企业定位关键字不能为空.', [], '40010');
         }
-        $data_dict=$tp_rec->params;
-        if (empty($data_dict)){
-             return JsonYll::encode(JsonYll::FAIL, '模版数据参数不能为空.', [], '40010');
-        }else{
-            $tp_data_dict= json_decode($data_dict,true);
-        }
+      
         
         $parameter_map=Yii::$app->request->post("parameter_map");
+         if (empty($parameter_map)){
+                return JsonYll::encode(JsonYll::FAIL, '模版数据参数不能为空.', [], '40010');
+            }
+            
+        $parameter_array= json_decode($parameter_map,true);
+        
+        foreach ($parameter_array as $key => $value) {
+            if (empty($value)){
+                return JsonYll::encode(JsonYll::FAIL, '模版数据参数不能为空.', [], '40010');
+                exit;
+            }
+            $parameter_array[$key]=(string)$value;
+        }
+        ksort($parameter_array);
+
+        
+//        $data_dict=$tp_rec->params;
+//        if (empty($data_dict)){
+//             return JsonYll::encode(JsonYll::FAIL, '模版数据参数不能为空.', [], '40010');
+//        }else{
+//            $tp_data_dict= json_decode($data_dict,true);
+//        }
 //        
 //        //模版字典        
 //        $dic_rec= \common\models\DataDict::find()->where(['in','id',$tp_data_dict])->select(array('id', 'dict_name', 'dict_value'))->all();
@@ -377,7 +394,8 @@ class FddOneSignatureController extends ActiveController{
             return JsonYll::encode(JsonYll::FAIL, '企业法大大CA不能为空,请联系管理员.', [], '40010');
         }
         
-        $model = FddContract::findOne(['user_id' => $user_id,'sign_user_id'=>$ge_user_id, 'template_id' => $template_id,'status'=>1]);
+        $parameter_map=json_encode($parameter_array);
+        $model = FddContract::findOne(['user_id' => $user_id,'sign_user_id'=>$ge_user_id, 'template_id' => $template_id,'parameter'=>$parameter_map,'status'=>1]);
         if (empty($model->id)) {
             //合同编号
             $contract_id = "HT" . $this->getRand();
@@ -389,7 +407,7 @@ class FddOneSignatureController extends ActiveController{
             $model->sign_user_id = $ge_user_id;
             $model->contract_id = $contract_id;
             $model->template_id = $template_id;
-            $model->parameter =$parameter_map; // json_encode($parameter_map);
+            $model->parameter =$parameter_map;  //json_encode($parameter_array);
             $model->sign_keyword = $sign_keyword;
             $model->doc_title = $doc_title;          
             $model->file = $this->pathfile . "/" . $tp_rec->template_file;
