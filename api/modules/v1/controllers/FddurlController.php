@@ -87,7 +87,11 @@ class FddurlController extends ActiveController {
             
             //企业自动签署
           //  return $this->actionAutoSign($user_id, $doc_title, $contract_id, $customer_id, $sign_keyword);
-          echo "签署成功！";
+            if ($rsContract->callback){            
+                return  $this->redirect($rsContract->callback);
+            }else{
+                echo "签署成功！";
+            }
           //  return JsonYll::encode(JsonYll::SUCCESS, '签署成功！', ['transaction_id'=>$fdd_data['transaction_id'],'download_url'=>$fdd_data['download_url'],'viewpdf_url'=>$fdd_data['viewpdf_url']], '200');
            
         }else{

@@ -120,6 +120,7 @@ class FddOneSignatureController extends ActiveController{
         if (empty($user_mobile)) {
             return JsonYll::encode(JsonYll::FAIL, '签约用户手机不能为空.', [], '40010');
         }
+        $callback=Yii::$app->request->post("callback");
         
         //获取模版记录
         $template_id=Yii::$app->request->post("template_id");
@@ -222,6 +223,7 @@ class FddOneSignatureController extends ActiveController{
             $model->doc_title = $doc_title;          
             $model->file = $this->pathfile . "/" . $tp_rec->template_file;
             $model->timestamp = date("YmdHis");
+            $model->callback= isset($callback)?$callback:'';
             $contractStatus = $model->save();
         } else {
             //合同编号
