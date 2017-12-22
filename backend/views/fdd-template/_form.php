@@ -46,7 +46,7 @@ use yii\helpers\ArrayHelper;
         $model->visible = 1;
     } ?>
     <?= $form->field($model, 'visible')->radioList(['1' => '可用', '2' => '不可用']) ?>
-
+    <?= $form->field($model, 'is_auto')->radioList(['1'=>'自动签','2'=>'线下手动签']) ?>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '新增' : '修改', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>

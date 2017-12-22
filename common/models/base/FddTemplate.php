@@ -32,7 +32,7 @@ class FddTemplate extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'visible', 'updated_at', 'created_at'], 'integer'],
+            [['user_id','is_auto', 'visible', 'updated_at', 'created_at'], 'integer'],
             [['template_name'], 'string', 'max' => 50],
             [['template_file','sign_keyword'], 'string', 'max' => 125],
             [['template_id'], 'string', 'max' => 32],
@@ -54,6 +54,7 @@ class FddTemplate extends \yii\db\ActiveRecord
             'template_id' => '模版ID',
             'params' => '模版字典数据',
             'visible' => '是否可用',
+            'is_auto'=>'是否自动签章',
             'updated_at' => '更新时间',
             'created_at' => '创造时间',
         ];
