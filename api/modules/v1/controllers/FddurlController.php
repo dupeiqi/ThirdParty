@@ -135,7 +135,7 @@ class FddurlController extends ActiveController {
 //                 $log->messages[] = [$value->user_id."合同编号：".$value->contract_id.'手动签署',1,'fdd',$time];
 //                 continue;
 //            }
-          echo $value->template_id;
+          
             $fdd_template=\common\models\FddTemplate::findOne(['template_id'=>$value->template_id]);
             if (empty($fdd_template)){
                 $log->messages[] = [$value->user_id."合同编号：".$value->contract_id.'模版ID有误',1,'fdd',$time];

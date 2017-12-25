@@ -160,9 +160,9 @@ class FddOneSignatureController extends ActiveController{
 //        }
         
         //特殊
-        $parameter_map['platformName']=Yii::$app->user->identity->company_name;
-        $parameter_map['borrower']=$user_name;
-        $parameter_map['homeUrl']='http://www.qianbitou.cn';
+        $parameter_map['userName']=$user_name;
+        $parameter_map['userCard']=$id_card;
+        $parameter_map['userDate']=date("Y-m-d");
         
         //个人用户是否存在（添加法大大的CA）
         $user_model=new GrUser;
