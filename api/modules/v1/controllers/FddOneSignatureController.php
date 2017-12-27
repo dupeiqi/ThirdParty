@@ -429,7 +429,7 @@ class FddOneSignatureController extends ActiveController{
             if (empty($model->status)) {  //是否请求法大大成功
                 //请求法大大接口
                 $fdd = new FddApi();
-                $jsondata = json_decode($fdd->invokeGenerateContract($template_id, $contract_id, $doc_title, $parameter_map, 12, 4, ''), true);
+                $jsondata = json_decode($fdd->invokeGenerateContract($template_id, $contract_id, $doc_title, $parameter_map, 9, 4, ''), true);
                 if ($jsondata['code'] == '1000') {
 
                     $model->status = 1;
