@@ -34,7 +34,7 @@ class User extends \yii\db\ActiveRecord
     {
         return [
             [['type','is_auto', 'status', 'updated_at', 'created_at'], 'integer'],
-            [['mobile'],'match','pattern'=>'/^1[3|4|5|7|8]\d{9}$/','message'=>'手机格式不正确!'],
+            [['mobile'],'match','pattern'=>'/^1[3|4|5|6|7|8|9]\d{9}$/','message'=>'手机格式不正确!'],
             [['company_name', 'token'], 'string', 'max' => 125],
             [['id_card','fdd_ca'], 'string', 'max' => 32],
         ];
