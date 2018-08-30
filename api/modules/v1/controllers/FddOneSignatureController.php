@@ -320,7 +320,7 @@ class FddOneSignatureController extends ActiveController{
         $parameter_array= json_decode($parameter_map,true);
         
         foreach ($parameter_array as $key => $value) {
-            if (empty($value)){
+            if ((string)$value == '') {
                 return JsonYll::encode(JsonYll::FAIL, '模版数据参数不能为空.', [], '40010');
                 exit;
             }
