@@ -18,6 +18,8 @@ class FddApi extends FddBase {
      * @param mobile 手机号
      * @return
      */
+    public $notifyUrl = 'http://thirdapi.qianbitou.cn/v1/fddurl/notify-url';
+
     public function invokeSyncPersonAuto($customer_name, $mobile, $id_card, $email='', $ident_type='') {
         if (empty($customer_name)||empty($mobile)||empty($id_card)){
             return ['code'=>'4004','msg'=>'必填字段为空值！'];
@@ -215,11 +217,12 @@ class FddApi extends FddBase {
         $params['return_url'] = trim($return_url);
         $params['notify_url'] = trim($notify_url);
         $params['msg_digest'] = $msgDigest;
+        $params['notifyUrl'] = $this->notifyUrl;
 
         //获取URL
         $url = $this->getURLOfExtSign();
         //组合访问网址
-        $get_url = $url . "?timestamp=" . $timpstamp . "&transaction_id=" . $params['transaction_id'] . "&contract_id=" . $params['contract_id'] . "" . "&return_url=".urlencode($params['return_url'])."&customer_id=" . $params['customer_id'] . "" . "&doc_title=" . urlencode($params['doc_title']) . "" . "&app_id=" . $params['app_id'] . "&msg_digest=" . $params['msg_digest'] . "&v=2.0";
+        $get_url = $url . "?timestamp=" . $timpstamp . "&transaction_id=" . $params['transaction_id'] . "&contract_id=" . $params['contract_id'] . "" . "&return_url=".urlencode($params['return_url'])."&customer_id=" . $params['customer_id'] . "" . "&doc_title=" . urlencode($params['doc_title']) . "" . "&app_id=" . $params['app_id'] . "&msg_digest=" . $params['msg_digest'] . "&v=2.0" . '&notifyUrl=' . $params['notifyUrl'];
 
         return $get_url;
     }

@@ -103,13 +103,74 @@ class FddurlController extends ActiveController {
     }
     
     
-
     /**
      * 法大大异步返回
      */
     public function actionNotifyUrl() {
+       //获取法大大推送信息
+        $fdd_data=$_POST;
+        $appId=Yii::$app->params['fddConfig']['app_id'];
+        $secret=Yii::$app->params['fddConfig']['app_secret'];
+        if (empty($fdd_data['result_code']) || $fdd_data['result_code']!='3000'){
+            echo "数据验证错误，请联系管理员";
+            exit;
+        }
+        //验证是否正确
 
+        $timestamp = $fdd_data['timestamp'];
+        $sha1 = strtoupper(sha1($secret . $fdd_data['transaction_id']));
+        $md5 = strtoupper(md5($timestamp));
+        $sha2 = strtoupper(sha1($appId . $md5 . $sha1));
+        $msgDigest = base64_encode($sha2);
+        if ($msgDigest == $fdd_data['msg_digest']){
+            //更改签署状态和合同地址
+            $model = FddSignature::findOne(['transaction_id' => $fdd_data['transaction_id']]);
+            if (empty($model)) {
+                echo '数据验证错误，请联系管理员.';
+                exit;
+            }
+            $model->download_url = urldecode($fdd_data['download_url']);
+            $model->viewpdf_url = urldecode($fdd_data['viewpdf_url']);
+            $model->timestamp = $timestamp;
+            $model->status = 1;
+            $ret = $model->save();
+
+            //获取企业用户
+            $user_rec = \common\models\base\User::findOne(['id' => $model->user_id]);
+            if (empty($user_rec)) {
+                echo '数据验证错误，请联系管理员.';
+                exit;
+            }
+            $user_id = $model->user_id;
+            $customer_id = $user_rec->fdd_ca;
+
+            //获取合同数据
+            $rsContract = \common\models\FddContract::findOne(['contract_id' => $model->contract_id, "status" => 1]);
+            if (empty($rsContract)) {
+                echo '合同已签署或没有生成，请联系管理员.';
+                exit;
+            }
+
+            //修改合同编号状态（个人签署成功）
+            $rsContract->status = 3;
+            $rsContract->save();
+
+            $doc_title = $rsContract->doc_title;
+            $sign_keyword = $rsContract->sign_keyword;
+            $contract_id=$rsContract->contract_id;
+            //企业自动签署
+            if ($rsContract->callback){
+                return  $this->redirect($rsContract->callback);
+            }else{
+                echo "签署成功！";
+            }
+        }else{
+            echo '数据验证错误，请联系管理员';
+        }
+
+        exit;
     }
+
     
      /**
      * 企业签署跑对列
